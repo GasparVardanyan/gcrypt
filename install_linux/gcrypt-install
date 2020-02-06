@@ -1,6 +1,0 @@
-#!/bin/sh
-git clone https://github.com/GasparVardanyan/gcrypt.git
-cd GCrypt
-sh $PWD/compile
-sudo cp $PWD/gcrypt /bin/
-sudo chmod +x /bin/gcrypt
