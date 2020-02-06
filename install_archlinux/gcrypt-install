@@ -1,0 +1,5 @@
+#!/bin/sh
+mkdir GCrypt
+cd GCrypt
+curl -O https://raw.githubusercontent.com/BlackArch/blackarch/master/packages/gcrypt/PKGBUILD
+makepkg -si
