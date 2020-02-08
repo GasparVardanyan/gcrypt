@@ -54,11 +54,11 @@ close_streams:																			\
 	}																					\
 // GCRYPT_F_PROCESS_WRITE
 
-# define GCRYPT_F_DECHASH																\
+# define GCRYPT_F_PROCESS_DECHASH																\
 	ubyte hashDec [256];																\
 	for (i = 0; i < 256; i++)															\
 		hashDec [hash [i]] = i;															\
-// GCRYPT_F_DECHASH
+// GCRYPT_F_PROCESS_DECHASH
 
 # define GCRYPT_P_ENCRYPT inp [i] = hash [rot += inp [i]]
 # define GCRYPT_P_DECRYPT rot += inp [i] = hashDec [inp [i]] - rot
@@ -102,7 +102,7 @@ void gEncryptF (const char * const key, const char * const ifile, const char * c
 void gDecryptF (const char * const key, const char * const ifile, const char * const ofile, const size_t b)
 {
 	GCRYPT_F_PROCESS_BEGIN
-	GCRYPT_F_DECHASH
+	GCRYPT_F_PROCESS_DECHASH
 	GCRYPT_F_PROCESS_WRITE (GCRYPT_P_DECRYPT)
 	GCRYPT_F_PROCESS_END
 }
