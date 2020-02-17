@@ -27,7 +27,7 @@
 		goto close_streams;																\
 	}																					\
 																						\
-	gHash ((const ubyte * const) key, hash); 											\
+	gHash ((const ubyte * const) key, hash);											\
 																						\
 	register size_t bufsize, i;															\
 	register ubyte rot = 0;																\
@@ -54,7 +54,7 @@ close_streams:																			\
 	}																					\
 // GCRYPT_F_PROCESS_WRITE
 
-# define GCRYPT_F_PROCESS_DECHASH																\
+# define GCRYPT_F_PROCESS_DECHASH														\
 	ubyte hashDec [256];																\
 	for (i = 0; i < 256; i++)															\
 		hashDec [hash [i]] = i;															\
