@@ -1,7 +1,6 @@
 # ifndef GCRYPT_GCRYPT_H__
 # define GCRYPT_GCRYPT_H__
 
-# include <stdint.h>
 # include <stddef.h>
 # include <stdio.h>
 # include <string.h>
