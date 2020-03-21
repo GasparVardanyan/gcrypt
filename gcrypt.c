@@ -65,31 +65,49 @@ close_streams:																			\
 
 typedef unsigned char ubyte;
 
-static void gHash (const ubyte * const key, ubyte hash [256])
+static void gHash (const ubyte * key, ubyte out [256])
 {
-	size_t i, j;
-	ubyte h1 [256], s, sm, b, bi, si, wi;
-	unsigned short r, ic;
-	for (i = 0; i < 256; i++) h1 [i] = i;
-	for (i = 0; key [i] != 0; i++)
+	ubyte arr256 [256];
+
+	ubyte * hash = out;
+	ubyte * hash_p = arr256;
+	ubyte * swp;
+
+	for (size_t i = 0; i < 256; i++)
+		hash [i] = i;
+
+	while (* key)
 	{
-		b = key [i];
-		ic = b * b;
-		for (r = 0; r < ic; r++)
+		unsigned short c = * key * * key;
+
+		for (unsigned short ci = 0; ci < c; ci++)
 		{
-			s = 256 / b;
-			sm = 256 % b;
-			if (sm != 0) s++;
-			wi = b;
-			for (bi = 0; bi < b; bi++)
-			{
-				if (bi == sm) s--;
-				for (si = 0; si < s; si++)
-					hash [wi++] = h1 [(ubyte) (b * si + bi)];
-			}
-			for (j = 0; j < 256; j++) h1 [j] = hash [j];
+			ubyte d = 256 / * key;
+			ubyte m = 256 % * key;
+			ubyte hi = * key;
+
+			d += 1;
+
+			for (unsigned short mi = 0; mi < m; mi++)
+				for (unsigned short di = 0; di < d; di++)
+					hash_p [hi++] = hash [di * * key + mi];
+
+			d -= 1;
+
+			for (unsigned short mi = m; mi < * key; mi++)
+				for (unsigned short di = 0; di < d; di++)
+					hash_p [hi++] = hash [di * * key + mi];
+
+			swp = hash;
+			hash = hash_p;
+			hash_p = swp;
 		}
+
+		key++;
 	}
+
+	if (hash != out)
+		memcpy (out, hash, 256);
 }
 
 void gEncryptF (const char * const key, const char * const ifile, const char * const ofile, const size_t b)
