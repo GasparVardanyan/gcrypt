@@ -1,3 +1,0 @@
-#!/bin/sh
-i686-w64-mingw32-gcc -std=c18 -pedantic-errors -Werror=pedantic -Wall -Wextra -Werror -O3 -static -static-libgcc -o gcrypt32.exe *.c
-x86_64-w64-mingw32-gcc -std=c18 -pedantic-errors -Werror=pedantic -Wall -Wextra -Werror -O3 -static -static-libgcc -o gcrypt64.exe *.c
