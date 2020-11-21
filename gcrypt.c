@@ -111,14 +111,14 @@ static void gHash (const unsigned char * key, unsigned char out [256])
 		memcpy (out, hash, 256);
 }
 
-void gEncryptF (const char * const key, const char * const ifile, const char * const ofile, const size_t b)
+void gEncryptF (const char * const key, const char * const restrict ifile, const char * const restrict ofile, const size_t b)
 {
 	GCRYPT_F_PROCESS_BEGIN
 	GCRYPT_F_PROCESS_WRITE (GCRYPT_P_ENCRYPT)
 	GCRYPT_F_PROCESS_END
 }
 
-void gDecryptF (const char * const key, const char * const ifile, const char * const ofile, const size_t b)
+void gDecryptF (const char * const key, const char * const restrict ifile, const char * const restrict ofile, const size_t b)
 {
 	GCRYPT_F_PROCESS_BEGIN
 	GCRYPT_F_PROCESS_DECHASH

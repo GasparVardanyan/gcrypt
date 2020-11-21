@@ -9,8 +9,8 @@
 extern "C" {
 # endif // __cplusplus
 
-extern void gEncryptF (const char * const key, const char * const ifile, const char * const ofile, const size_t b);
-extern void gDecryptF (const char * const key, const char * const ifile, const char * const ofile, const size_t b);
+extern void gEncryptF (const char * const key, const char * const restrict ifile, const char * const restrict ofile, const size_t b);
+extern void gDecryptF (const char * const key, const char * const restrict ifile, const char * const restrict ofile, const size_t b);
 
 # ifdef __cplusplus
 }
