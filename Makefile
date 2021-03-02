@@ -18,7 +18,7 @@ gcrypt:		$(OBJ)
 #             x86_64-w64-mingw32-gcc $(CFLAGS) -static -static-libgcc -o gcrypt64.exe $(SRC)
 
 clean:
-			rm -f $(OBJ) gcrypt
+			rm -f $(OBJ) gcrypt grypt*.exe
 
 install:	gcrypt
 			mkdir -p ${DESTDIR}${PREFIX}/bin

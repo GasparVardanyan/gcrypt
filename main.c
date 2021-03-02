@@ -4,6 +4,26 @@
 # include <errno.h>
 # include "gcrypt.h"
 
+# define OPT_HELP "--help"
+# define OPT_VERSION "--version"
+# define OPT_ENCRYPT "-e"
+# define OPT_DECRYPT "-d"
+# define OPT_BS "-b"
+
+# define CHECK_ARG(a,n,o) (strcmp (a, argv [i]) == 0 && (o ? argc == 2 + n : (i + n < argc ? ++i : 0)))
+# define ARG_ITER for (int i = 1; i < argc;)
+# define GET_STR(x) (x = argv [i++])
+# define GET_ULL(x)								\
+{												\
+	char * buff, * ep = NULL;					\
+	GET_STR (buff);								\
+	errno = 0;									\
+	x = strtoull (buff, & ep, 10);				\
+	if (errno || ep != strrchr (buff, 0))		\
+		g_exit (err_invalid_args);				\
+}												\
+// GET_ULL
+
 static const char * const header =
 # ifdef __linux__
 	"    \033[37m                                  _\n"
@@ -37,12 +57,6 @@ static const char * const header =
 	"                                             / /  | |\n"
 # endif // __linux__
 ;
-
-# define OPT_HELP "--help"
-# define OPT_VERSION "--version"
-# define OPT_ENCRYPT "-e"
-# define OPT_DECRYPT "-d"
-# define OPT_BS "-b"
 
 static const char * const help =
 	"Options:\n"
@@ -79,75 +93,69 @@ static const char * const err_same_iofile =
 
 static _Noreturn void g_exit (const char * const);
 
-static void (* action) ();
+static G_ACTION (* action);
 
 static const char * input_key;
 static const char * input_ifile;
 static const char * input_ofile;
 static size_t input_b = 512u;
 
-# define CHECK_ARG_PARAMS(n) (i + n >= argc ? g_exit (err_invalid_args), 0 : ++i)
-# define CHECK_ARG(a,n) strcmp (a, argv [i]) == 0 && CHECK_ARG_PARAMS (n)
-# define GET_ARG argv [i++]
 # define SET_ACTION(a)					\
-	input_key = GET_ARG;				\
-	input_ifile = GET_ARG;				\
-	input_ofile = GET_ARG;				\
+{										\
+	GET_STR (input_key);				\
+	GET_STR (input_ifile);				\
+	GET_STR (input_ofile);				\
 	if (!action) action = a;			\
 	else g_exit (err_invalid_args);		\
+}										\
 // SET_ACTION
+# define CALL_ACTION(action)														\
+{																					\
+	if (input_b == 0) g_exit (err_invalid_args);									\
+	else if (strcmp (input_ifile, input_ofile) == 0) g_exit (err_same_iofile);		\
+	else if (!* input_key) g_exit (err_empty_key);									\
+	(* action) (input_key, input_ifile, input_ofile, input_b);						\
+}																					\
+// CALL_ACTION
 
 int main (int argc, char * argv [])
 {
 	if (argc == 1)
 	{
 		puts (header);
-		return 0;
+		g_exit (NULL);
 	}
-	else if (argc == 2)
+	else ARG_ITER
 	{
-		if (strcmp (argv [1], OPT_HELP) == 0)
+		if (CHECK_ARG (OPT_HELP, 0, 1))
 		{
 			puts (header), puts (help);
-			return 0;
+			g_exit (NULL);
 		}
-		else if (strcmp (argv [1], OPT_VERSION) == 0)
+		else if (CHECK_ARG (OPT_VERSION, 0, 1))
 		{
 			puts ("GCrypt " GCRYPT_VERSION);
-			return 0;
+			g_exit (NULL);
 		}
-		else g_exit (err_invalid_args);
-	}
-	else for (int i = 1; i < argc;)
-	{
-		if (CHECK_ARG (OPT_ENCRYPT, 3))
+		else if (CHECK_ARG (OPT_ENCRYPT, 3, 0))
 		{
 			SET_ACTION (gEncryptF);
-			continue;
 		}
-		else if (CHECK_ARG (OPT_DECRYPT, 3))
+		else if (CHECK_ARG (OPT_DECRYPT, 3, 0))
 		{
 			SET_ACTION (gDecryptF);
-			continue;
 		}
-		else if (CHECK_ARG (OPT_BS, 1))
+		else if (CHECK_ARG (OPT_BS, 1, 0))
 		{
-			char * buff = GET_ARG, * ep = NULL;
-			errno = 0;
-			input_b = strtoull (buff, & ep, 10);
-			if (errno || ep != strrchr (buff, 0) || input_b == 0)
-				g_exit (err_invalid_args);
-			continue;
+			GET_ULL (input_b);
 		}
-		g_exit (err_invalid_args);
+		else
+		{
+			g_exit (err_invalid_args);
+		}
 	}
 
-	if (action)
-	{
-		if (strcmp (input_ifile, input_ofile) == 0) g_exit (err_same_iofile);
-		else if (!* input_key) g_exit (err_empty_key);
-		(* action) (input_key, input_ifile, input_ofile, input_b);
-	}
+	if (action) CALL_ACTION (action);
 //	else g_exit (err_invalid_args);
 }
 
