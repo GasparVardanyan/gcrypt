@@ -25,7 +25,7 @@
 // GET_ULL
 
 // # define FLAG_ITER if (* argv [i] != '-') g_exit (err_invalid_args); for (const char * flags = argv [i++] + 1; * flags; flags++)
-// # define CHECK_FLAG(f) (* flags == f)
+// # define CHECK_FLAG(f) (* flags == * (f + 1))
 // yagni...
 
 static const char * const header =
@@ -155,7 +155,21 @@ int main (int argc, char * argv [])
 		}
 		else
 		{
-			g_exit (err_invalid_args);
+//			FLAG_ITER
+//			{
+//				if (CHECK_FLAG (FLG_NO_PAD))
+//				{
+//					input_P = 1;
+//				}
+//				else if (CHECK_FLAG (FLG_NO_XOR))
+//				{
+//					input_X = 1;
+//				}
+//				else
+//				{
+					g_exit (err_invalid_args);
+//				}
+//			}
 		}
 	}
 
