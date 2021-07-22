@@ -13,6 +13,6 @@
              p3rf0rM4nc3                      \ / |  _/
                                              / /  | |
 
-     |                     |
-    /|\  BlackArch Linux  /|\
+           |                     |
+          /|\  BlackArch Linux  /|\
     https://www.blackarch.org/crypto.html
