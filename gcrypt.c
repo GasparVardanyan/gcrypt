@@ -1,6 +1,7 @@
 # include <stdio.h>
-# include <string.h>
 # include <stdlib.h>
+# include <string.h>
+
 # include "gcrypt.h"
 
 # define GCRYPT_F_PROCESS_BEGIN										\
