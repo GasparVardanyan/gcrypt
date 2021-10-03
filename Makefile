@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-std=c18 -pedantic-errors -Werror=pedantic -Wall -Wextra -Werror -O3
-DEPS=gcrypt.h
-SRC=main.c gcrypt.c
+DEPS=header.h gcrypt.h options.h readopts.h
+SRC=gcrypt.c main.c options.c
 OBJ=${SRC:%.c=%.o}
 PREFIX = /usr/local
 
