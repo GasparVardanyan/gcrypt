@@ -14,25 +14,6 @@ static const char * input_ifile;
 static const char * input_ofile;
 static size_t input_b = 512u;
 
-# define SET_ACTION(a)					\
-{										\
-	GET_STR (input_key);				\
-	GET_STR (input_ifile);				\
-	GET_STR (input_ofile);				\
-	if (!action) action = a;			\
-	else g_exit (err_invalid_args);		\
-}										\
-// SET_ACTION
-
-# define CALL_ACTION()																\
-{																					\
-	if (input_b == 0) g_exit (err_invalid_args);									\
-	else if (strcmp (input_ifile, input_ofile) == 0) g_exit (err_same_iofile);		\
-	else if (!* input_key) g_exit (err_empty_key);									\
-	(* action) (input_key, input_ifile, input_ofile, input_b);						\
-}																					\
-// CALL_ACTION
-
 int main (int argc, char * argv [])
 {
 	if (argc == 1)
@@ -52,6 +33,15 @@ int main (int argc, char * argv [])
 			puts ("GCrypt " GCRYPT_VERSION);
 			g_exit (NULL);
 		}
+# define SET_ACTION(a)					\
+{										\
+	GET_STR (input_key);				\
+	GET_STR (input_ifile);				\
+	GET_STR (input_ofile);				\
+	if (!action) action = a;			\
+	else g_exit (err_invalid_args);		\
+}										\
+// SET_ACTION
 		else if (CHECK_ARG (OPT_ENCRYPT, 3, 0))
 		{
 			SET_ACTION (gEncryptF);
@@ -60,6 +50,7 @@ int main (int argc, char * argv [])
 		{
 			SET_ACTION (gDecryptF);
 		}
+# undef SET_ACTION
 		else if (CHECK_ARG (OPT_BS, 1, 0))
 		{
 			GET_ULL (input_b, g_exit (err_invalid_args));
@@ -84,5 +75,11 @@ int main (int argc, char * argv [])
 		}
 	}
 
-	if (action) CALL_ACTION ();
+	if (action)
+	{
+		if (input_b == 0) g_exit (err_invalid_args);
+		else if (strcmp (input_ifile, input_ofile) == 0) g_exit (err_same_iofile);
+		else if (!* input_key) g_exit (err_empty_key);
+		(* action) (input_key, input_ifile, input_ofile, input_b);
+	}
 }
