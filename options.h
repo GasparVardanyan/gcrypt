@@ -35,8 +35,8 @@ static const char * const help =
 
 # define ERR_HELP_MSG "Help: gcrypt "OPT_HELP"\n"
 
-static const char * const err_invalid_args =
-	"Error: invalid arguments list.\n"
+static const char * const err_invalid_usage =
+	"Error: invalid usage.\n"
 	ERR_HELP_MSG
 ;
 

@@ -33,14 +33,14 @@ int main (int argc, char * argv [])
 			puts ("GCrypt " GCRYPT_VERSION);
 			g_exit (NULL);
 		}
-# define SET_ACTION(a)					\
-{										\
-	GET_STR (input_key);				\
-	GET_STR (input_ifile);				\
-	GET_STR (input_ofile);				\
-	if (!action) action = a;			\
-	else g_exit (err_invalid_args);		\
-}										\
+# define SET_ACTION(a)						\
+{											\
+	GET_STR (input_key);					\
+	GET_STR (input_ifile);					\
+	GET_STR (input_ofile);					\
+	if (!action) action = a;				\
+	else g_exit (err_invalid_usage);		\
+}											\
 // SET_ACTION
 		else if (CHECK_ARG (OPT_ENCRYPT, 3, 0))
 		{
@@ -53,7 +53,7 @@ int main (int argc, char * argv [])
 # undef SET_ACTION
 		else if (CHECK_ARG (OPT_BS, 1, 0))
 		{
-			GET_ULL (input_b, g_exit (err_invalid_args));
+			GET_ULL (input_b, g_exit (err_invalid_usage));
 		}
 		else
 		{
@@ -69,7 +69,7 @@ int main (int argc, char * argv [])
 //				}
 //				else
 //				{
-					g_exit (err_invalid_args);
+					g_exit (err_invalid_usage);
 //				}
 //			}
 		}
@@ -77,9 +77,11 @@ int main (int argc, char * argv [])
 
 	if (action)
 	{
-		if (input_b == 0) g_exit (err_invalid_args);
+		if (input_b == 0) g_exit (err_invalid_usage);
 		else if (strcmp (input_ifile, input_ofile) == 0) g_exit (err_same_iofile);
 		else if (!* input_key) g_exit (err_empty_key);
 		(* action) (input_key, input_ifile, input_ofile, input_b);
 	}
+	else
+		g_exit (err_invalid_usage);
 }
