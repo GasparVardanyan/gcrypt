@@ -19,8 +19,7 @@
 }												\
 // GET_ULL
 
-// # define FLAG_ITER if (* argv [i] != '-') g_exit (err_invalid_args); for (const char * flags = argv [i++] + 1; * flags; flags++)
-// # define CHECK_FLAG(f) (* flags == * (f + 1))
-// yagni...
+# define FLAG_ITER if (* argv [i] != '-') g_exit (err_invalid_usage); for (const char * flags = argv [i++] + 1; * flags; flags++)
+# define CHECK_FLAG(f) (* flags == * (f + 1))
 
 # endif // GCRYPT_READOPTS_H__

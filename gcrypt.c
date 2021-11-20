@@ -5,64 +5,64 @@
 
 # include "gcrypt.h"
 
-# define GCRYPT_F_PROCESS_BEGIN										\
-	FILE															\
-		* istream = fopen (ifile, "rb"),							\
-		* ostream = fopen (ofile, "wb")								\
-	;																\
-	if (!istream)													\
-	{																\
-		fputs ("Error opening ifile. Aborting.\n", stderr);			\
-		return;														\
-	}																\
-	if (!ostream)													\
-	{																\
-		fputs ("Error opening ofile. Aborting.\n", stderr);			\
-		return;														\
-	}																\
-																	\
-	unsigned char													\
-		* inp,														\
-		hash [256]													\
-	;																\
-																	\
-	if ((inp = malloc (b)) == NULL)									\
-	{																\
-		fputs ("Error allocating buffer. Aborting.\n", stderr);		\
-		goto close_streams;											\
-	}																\
-																	\
-	gHash ((const unsigned char * const) key, hash);				\
-																	\
-	register size_t bufsize, i;										\
-	register unsigned char rot = 0;									\
+# define GCRYPT_F_PROCESS_BEGIN											\
+	FILE																\
+		* istream = ifile ? fopen (ifile, "rb") : stdin,				\
+		* ostream = ofile ? fopen (ofile, "wb") : stdout;				\
+																		\
+	if (!istream)														\
+	{																	\
+		fputs ("Error opening ifile. Aborting.\n", stderr);				\
+		return;															\
+	}																	\
+	if (!ostream)														\
+	{																	\
+		fputs ("Error opening ofile. Aborting.\n", stderr);				\
+		return;															\
+	}																	\
+																		\
+	unsigned char														\
+		* inp,															\
+		hash [256]														\
+	;																	\
+																		\
+	if ((inp = malloc (b)) == NULL)										\
+	{																	\
+		fputs ("Error allocating buffer. Aborting.\n", stderr);			\
+		goto close_streams;												\
+	}																	\
+																		\
+	gHash ((const unsigned char * const) key, hash);					\
+																		\
+	register size_t bufsize, i;											\
+	register unsigned char rot = 0;										\
 // GCRYPT_F_PROCESS_BEGIN
 
-# define GCRYPT_F_PROCESS_END										\
-	if (ferror (istream) || !feof (istream))						\
-		fputs ("Error reading ifile. Aborting.\n", stderr);			\
-	if (ferror (ostream))											\
-		fputs ("Error writing ofile. Aborting.\n", stderr);			\
-																	\
-	free (inp);														\
-close_streams:														\
-	fclose (istream);												\
-	fclose (ostream);												\
+# define GCRYPT_F_PROCESS_END											\
+	if (ferror (istream) || !feof (istream))							\
+		fputs ("Error reading ifile. Aborting.\n", stderr);				\
+	if (ferror (ostream))												\
+		fputs ("Error writing ofile. Aborting.\n", stderr);				\
+																		\
+	free (inp);															\
+close_streams:															\
+	if (ifile) fclose (istream);										\
+	if (ofile) fclose (ostream);										\
 // GCRYPT_F_PROCESS_END
 
-# define GCRYPT_F_PROCESS_WRITE(pattern)							\
-	while ((bufsize = fread (inp, 1, b, istream)))					\
-	{																\
-		for (i = 0; i < bufsize; i++)								\
-			pattern;												\
-		fwrite (inp, 1, bufsize, ostream);							\
-	}																\
+# define GCRYPT_F_PROCESS_WRITE(pattern)								\
+	while ((bufsize = fread (inp, 1, b, istream)))						\
+	{																	\
+		for (i = 0; i < bufsize; i++)									\
+			pattern;													\
+		fwrite (inp, 1, bufsize, ostream);								\
+	}																	\
 // GCRYPT_F_PROCESS_WRITE
 
-# define GCRYPT_F_PROCESS_DECHASH									\
-	unsigned char hashDec [256];									\
-	for (i = 0; i < 256; i++)										\
-		hashDec [hash [i]] = i;										\
+# define GCRYPT_F_PROCESS_DECHASH										\
+	unsigned char hashDec [256];										\
+	for (i = 0; i < 256; i++)											\
+		hashDec [hash [i]] = i;											\
 // GCRYPT_F_PROCESS_DECHASH
 
 # define GCRYPT_P_ENCRYPT inp [i] = hash [rot += inp [i]]
