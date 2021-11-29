@@ -1,7 +1,7 @@
 # ifndef GCRYPT_GCRYPT_H__
 # define GCRYPT_GCRYPT_H__
 
-# define GCRYPT_VERSION "v3.3"
+# define GCRYPT_VERSION "v3.4"
 
 # define G_ACTION(A) void (A) (const char * const key, const char * const restrict ifile, const char * const restrict ofile, const _Bool nornd)
 
