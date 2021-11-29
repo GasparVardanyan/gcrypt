@@ -1,7 +1,12 @@
 # include <stddef.h>
 # include <stdio.h>
-# include <stdlib.h>
 # include <string.h>
+
+# ifndef __linux__ // TODO: find a portable way to check if BSD env or no
+#     include <stdlib.h>
+# else
+#     include <bsd/stdlib.h>
+# endif // __linux__
 
 # include "gcrypt.h"
 
@@ -21,20 +26,10 @@
 		return;															\
 	}																	\
 																		\
-	unsigned char														\
-		* inp,															\
-		hash [256]														\
-	;																	\
-																		\
-	if ((inp = malloc (b)) == NULL)										\
-	{																	\
-		fputs ("Error allocating buffer. Aborting.\n", stderr);			\
-		goto close_streams;												\
-	}																	\
+	unsigned char hash [256];											\
 																		\
 	gHash ((const unsigned char * const) key, hash);					\
 																		\
-	register size_t bufsize, i;											\
 	register unsigned char rot = 0;										\
 // GCRYPT_F_PROCESS_BEGIN
 
@@ -44,29 +39,9 @@
 	if (ferror (ostream))												\
 		fputs ("Error writing ofile. Aborting.\n", stderr);				\
 																		\
-	free (inp);															\
-close_streams:															\
 	if (ifile) fclose (istream);										\
 	if (ofile) fclose (ostream);										\
 // GCRYPT_F_PROCESS_END
-
-# define GCRYPT_F_PROCESS_WRITE(pattern)								\
-	while ((bufsize = fread (inp, 1, b, istream)))						\
-	{																	\
-		for (i = 0; i < bufsize; i++)									\
-			pattern;													\
-		fwrite (inp, 1, bufsize, ostream);								\
-	}																	\
-// GCRYPT_F_PROCESS_WRITE
-
-# define GCRYPT_F_PROCESS_DECHASH										\
-	unsigned char hashDec [256];										\
-	for (i = 0; i < 256; i++)											\
-		hashDec [hash [i]] = i;											\
-// GCRYPT_F_PROCESS_DECHASH
-
-# define GCRYPT_P_ENCRYPT inp [i] = hash [rot += inp [i]]
-# define GCRYPT_P_DECRYPT rot += inp [i] = hashDec [inp [i]] - rot
 
 static void gHash (const unsigned char * key, unsigned char out [256])
 {
@@ -116,14 +91,76 @@ static void gHash (const unsigned char * key, unsigned char out [256])
 G_ACTION (gEncryptF)
 {
 	GCRYPT_F_PROCESS_BEGIN
-	GCRYPT_F_PROCESS_WRITE (GCRYPT_P_ENCRYPT)
+
+	register int b;
+
+	if (nornd == 0)
+	{
+		register int rnexti = 0;
+		unsigned char rnext = 0, rr;
+
+		while ((b = fgetc (istream)) != EOF)
+		{
+			if (rnexti == rnext)
+			{
+				rnexti = 0;
+				rnext = arc4random () % 256;
+				rr = arc4random () % 256;
+				fputc (hash [rot += rnext], ostream);
+				fputc (hash [rot += rr], ostream);
+			}
+			else
+				rnexti++;
+
+			fputc (hash [rot += b], ostream);
+		}
+	}
+	else
+	{
+		while ((b = fgetc (istream)) != EOF)
+			fputc (hash [rot += b], ostream);
+	}
+
 	GCRYPT_F_PROCESS_END
 }
 
 G_ACTION (gDecryptF)
 {
 	GCRYPT_F_PROCESS_BEGIN
-	GCRYPT_F_PROCESS_DECHASH
-	GCRYPT_F_PROCESS_WRITE (GCRYPT_P_DECRYPT)
+
+	unsigned char hashDec [256];
+	for (int i = 0; i < 256; i++)
+		hashDec [hash [i]] = i;
+
+	register int b;
+
+	if (nornd == 0)
+	{
+		register int rnexti = 0;
+		unsigned char rnext = 0;
+
+		while ((b = fgetc (istream)) != EOF)
+		{
+			if (rnexti == rnext)
+			{
+				rnexti = -1;
+				rot += rnext = hashDec [b] - rot;
+				b = fgetc (istream);
+				rot += hashDec [b] - rot; // rr
+			}
+			else
+			{
+				rnexti++;
+				rot += b = hashDec [b] - rot;
+				fputc (b, ostream);
+			}
+		}
+	}
+	else
+	{
+		while ((b = fgetc (istream)) != EOF)
+			fputc ((rot += b = hashDec [b] - rot, b), ostream);
+	}
+
 	GCRYPT_F_PROCESS_END
 }

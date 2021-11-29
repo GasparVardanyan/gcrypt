@@ -1,5 +1,5 @@
-CC=gcc
-CFLAGS=-std=c18 -pedantic-errors -Werror=pedantic -Wall -Wextra -Werror -O3
+CFLAGS=-std=c18 -pedantic-errors -Werror=pedantic -O3
+LIBS=-lbsd # TODO: find a portable way to enable/disable this flag
 DEPS=header.h gcrypt.h options.h readopts.h
 SRC=gcrypt.c main.c options.c
 OBJ=${SRC:%.c=%.o}
@@ -9,7 +9,7 @@ PREFIX = /usr/local
 			$(CC) -c -o $@ $< $(CFLAGS)
 
 gcrypt:		$(OBJ)
-			$(CC) -o $@ $^
+			$(CC) -o $@ $^ $(LIBS)
 
 # win32:		$(DEPS) $(SRC)
 #             i686-w64-mingw32-gcc $(CFLAGS) -static -static-libgcc -o gcrypt32.exe $(SRC)
