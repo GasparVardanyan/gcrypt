@@ -25,7 +25,7 @@ static const char * const help =
 	"\t"OPT_ENCRYPT" key [ifile ofile]\taction: encrypt data\n"
 	"\t"OPT_DECRYPT" key [ifile ofile]\taction: decrypt data\n"
 	"\t"FLG_STDIO" \t\t\tflag: use the standart io (must become before action)\n"
-	"\t"FLG_NORND" \t\t\tflag: don't use randomisation\n"
+	"\t"FLG_NORND" \t\t\tflag: don't use randomisation (for backwards compatibility)\n"
 	"\t\t\t\t      randomisation generates different files every\n"
 	"\t\t\t\t      time you encrypt same file with same key\n"
 	"\nUsage examples:\n"
