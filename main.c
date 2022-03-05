@@ -2,8 +2,8 @@
 # include <stdio.h>
 # include <string.h>
 
-# include "header.h"
 # include "gcrypt.h"
+# include "header.h"
 # include "options.h"
 # include "readopts.h"
 
